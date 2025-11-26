@@ -28,7 +28,7 @@ INSTRUCTIONS_FILE = BASE_DIR / "results" / "instructions.txt"
 parser = argparse.ArgumentParser(description="Web Automation Project")
 parser.add_argument("--dry-run", action="store_true", help="Run automation without submitting POSTs")
 args = parser.parse_args()
-DRY_RUN = args.dry_run
+DRY_RUN = True if args.dry_run else False
 
 # -------------------------
 # Load Excel Data
