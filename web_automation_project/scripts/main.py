@@ -1,86 +1,107 @@
 # scripts/main.py
 
-from scripts.load_input import load_input
-from scripts.utils import read_input
-from scripts.output_container import OutputContainer
+import os
+from pathlib import Path
+import argparse
+
+# Load dependencies
+import pandas as pd  # Make sure to install: pip install pandas
 from scripts.browser_manager import BrowserManager
 from scripts.dom_actions import DOMActions
-from scripts.smart_matcher import SmartMatcher
-import json
-import pandas as pd
-import os
+from scripts.load_input import load_excel
+from scripts.output_container import OutputContainer
+from scripts.smart_match import match_tenants
+from scripts.api_replay import APIReplay
+from scripts.instructions_generator import InstructionsGenerator
 
-# -----------------------------
-# CONFIGURATION
-# -----------------------------
-DRY_RUN = True
-INPUT_FILE = "web_automation_project/input_data/input.xlsx"
-RESULTS_FILE = "web_automation_project/results/output.xlsx"
-CONFIG_FILE = "web_automation_project/config/steps_config.json"
-COOKIE_FILE = "web_automation_project/config/cookies.json"
+# -------------------------
+# Configuration & Paths
+# -------------------------
+BASE_DIR = Path(__file__).parent.parent
+INPUT_FILE = BASE_DIR / "input_data" / "input.xlsx"
+OUTPUT_FILE = BASE_DIR / "results" / "output.xlsx"
+INSTRUCTIONS_FILE = BASE_DIR / "results" / "instructions.txt"
 
-# -----------------------------
-# STEP 1: Load input file and config
-# -----------------------------
-load_input()
-df = read_input(INPUT_FILE)
+# -------------------------
+# CLI Arguments
+# -------------------------
+parser = argparse.ArgumentParser(description="Web Automation Project")
+parser.add_argument("--dry-run", action="store_true", help="Run automation without submitting POSTs")
+args = parser.parse_args()
+DRY_RUN = args.dry_run
 
-with open(CONFIG_FILE) as f:
-    config = json.load(f)
+# -------------------------
+# Load Excel Data
+# -------------------------
+print("[INFO] Loading Excel input...")
+input_df = load_excel(INPUT_FILE)
+print(f"[INFO] Loaded {len(input_df)} rows from input.xlsx")
 
-container = OutputContainer()
-matcher = SmartMatcher(threshold=75)
+# -------------------------
+# Initialize Output Container
+# -------------------------
+output_container = OutputContainer()
 
-# -----------------------------
-# STEP 2: Start browser
-# -----------------------------
-with BrowserManager(headless=False, cookie_file=COOKIE_FILE) as page:
-    dom = DOMActions(page)
+# -------------------------
+# Initialize Instructions Generator
+# -------------------------
+instructions = InstructionsGenerator(INSTRUCTIONS_FILE)
 
-    # Check if login page is needed
-    login_cfg = config.get("login_page")
-    if login_cfg and not os.path.exists(COOKIE_FILE):
-        page.goto(login_cfg["url"])
-        dom.fill_input(login_cfg["fields"]["username"], "<USERNAME>")
-        dom.fill_input(login_cfg["fields"]["password"], "<PASSWORD>")
-        dom.click_button(login_cfg["buttons"]["login"])
-        print("[INFO] Logged in manually, save cookies for future runs.")
+# -------------------------
+# Initialize API Replay (cookies/auth)
+# -------------------------
+api_replay = APIReplay(dry_run=DRY_RUN)
 
-    # -----------------------------
-    # STEP 3: Navigate payment update page
-    # -----------------------------
-    page_cfg = config["payment_update_page"]
-    page.goto(page_cfg["url"])
+# -------------------------
+# Optional: Launch Browser for DOM Actions
+# -------------------------
+browser_manager = BrowserManager(headless=True)
+page = browser_manager.launch()
+dom = DOMActions(page)
 
-    if page_cfg.get("dynamic_fields"):
-        dom_fields = list(dom.read_inputs().keys())
-    else:
-        dom_fields = page_cfg["rules"]["match_columns"]
+# -------------------------
+# Main Processing Loop
+# -------------------------
+print("[INFO] Starting main automation loop...")
+for index, row in input_df.iterrows():
+    # Step 1: Match tenant/property using smart matcher
+    matched = match_tenants(row, api_replay)
+    if not matched:
+        instructions.log(f"Row {index}: No match found for {row.get('Tenant Name')} / {row.get('Property')}")
+        continue
 
-    # -----------------------------
-    # STEP 4: Iterate Excel rows
-    # -----------------------------
-    for idx, row in df.iterrows():
-        mapped = matcher.map_excel_to_dom(row.to_dict(), dom_fields)
+    # Step 2: Prepare record for output container
+    record = {
+        "property": matched.get("property"),
+        "payee": matched.get("payee"),
+        "receipt_amount": row.get("Receipt Amount"),
+        "status": row.get("Status"),
+        "timestamp": pd.Timestamp.now()
+    }
+    output_container.add_record(record)
 
-        # Only update rows with Pending status
-        status_field = page_cfg["rules"]["update_if_status"]
-        if status_field in mapped and mapped[status_field] != "Pending":
+    # Step 3: Generate instructions
+    instructions.log(f"Row {index}: Update {record['payee']} payment to {record['receipt_amount']}")
+
+    # Step 4: Update Web API / DOM if not dry-run
+    if not DRY_RUN:
+        try:
+            api_replay.update_payment(record)
+        except Exception as e:
+            instructions.log(f"[ERROR] Failed to update row {index}: {e}")
             continue
 
-        container.add_record(mapped)
+        # Optional: Update DOM for visual testing (if needed)
+        # Example: dom.fill_input("#receipt", record["receipt_amount"])
+        # dom.click_button("#submit-payment")
 
-        if DRY_RUN:
-            print(f"[DRY RUN] Row {idx} mapped: {mapped}")
-        else:
-            # Fill dynamic fields
-            for dom_field, value in mapped.items():
-                selector = f"#{dom_field.replace(' ', '-').lower()}"
-                dom.fill_input(selector, value)
-            dom.click_button(page_cfg["buttons"]["submit"])
+print("[INFO] Automation loop finished.")
 
-# -----------------------------
-# STEP 5: Export results
-# -----------------------------
-pd.DataFrame(container.get_all()).to_excel(RESULTS_FILE, index=False)
-print(f"[INFO] Dry run completed. Output saved to {RESULTS_FILE}")
+# -------------------------
+# Save Results
+# -------------------------
+pd.DataFrame(output_container.get_all()).to_excel(OUTPUT_FILE, index=False)
+instructions.close()
+browser_manager.close()
+print(f"[INFO] Results saved to {OUTPUT_FILE}")
+print(f"[INFO] Instructions saved to {INSTRUCTIONS_FILE}")
