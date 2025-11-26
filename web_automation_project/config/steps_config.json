@@ -1,0 +1,11 @@
+[
+  {"action": "navigate", "url": "https://example.com/login"},
+  {"action": "fill", "selector": "#username", "column": "Username"},
+  {"action": "fill", "selector": "#password", "column": "Password"},
+  {"action": "click", "selector": "#login-button"},
+  {"action": "wait", "selector": "#dashboard"},
+  {"action": "fill", "selector": "#search", "column": "SearchTerm"},
+  {"action": "click", "selector": "#search-btn"},
+  {"action": "wait", "selector": "#results"},
+  {"action": "extract", "selector": "#result-text", "key": "Result"}
+]
