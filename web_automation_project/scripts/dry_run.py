@@ -1,9 +1,9 @@
 # scripts/dry_run.py
 
-from scripts.excel_helper import copy_production_excel
-from scripts.dom_actions import perform_actions
-from scripts.output_container import OutputContainer
-from scripts.instructions_generator import generate_instructions
+from .excel_helper import copy_production_excel
+from .dom_actions import perform_actions
+from .output_container import OutputContainer
+from .instructions_generator import generate_instructions
 import os
 
 class DryRunController:

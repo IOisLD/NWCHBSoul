@@ -9,15 +9,19 @@ class OutputContainer:
 
     def add_record(self, record: dict):
         """
-        record = {
-            "property": None,
-            "payee": None,
-            "receipt_amount": None,
-            "status": None,
-            "timestamp": None
-        }
+        Append a record. Caller should include expected fields; this helper
+        normalizes metadata fields.
         """
+        record.setdefault("success", False)
+        record.setdefault("completed", False)
+        record.setdefault("processed_timestamp", None)
+        record.setdefault("api_used", None)
+        record.setdefault("resident_href", None)
         self.records.append(record)
+
+    # Backwards-compatible alias
+    def add(self, record: dict):
+        self.add_record(record)
 
     def get_all(self):
         return self.records
@@ -30,5 +34,8 @@ class OutputContainer:
             print("[INFO] No records to save.")
             return
         df = pd.DataFrame(self.records)
+        # Normalize timestamp column
+        if "processed_timestamp" in df.columns:
+            df["processed_timestamp"] = df["processed_timestamp"].apply(lambda x: x if x is None else pd.to_datetime(x))
         df.to_excel(path, index=False)
         print(f"[INFO] Results saved to {path}")

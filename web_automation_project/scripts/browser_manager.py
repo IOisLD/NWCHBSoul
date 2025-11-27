@@ -27,6 +27,21 @@ class BrowserManager:
         self.page = self.context.new_page()
         return self.page
 
+    def launch(self):
+        """Launch the browser and return a Playwright `page` (imperative API).
+
+        This complements the context-manager API so callers can use either
+        `with BrowserManager(...) as page:` or `bm = BrowserManager(); page = bm.launch()`.
+        """
+        return self.__enter__()
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.browser.close()
         self.playwright.stop()
+
+    def close(self):
+        """Close browser when using the imperative API."""
+        try:
+            self.__exit__(None, None, None)
+        except Exception:
+            pass
