@@ -1,0 +1,15 @@
+{
+  "start_url": "https://jiffy.secondavenue.com",
+  "results": [
+    {
+      "url": "https://jiffy.secondavenue.com/",
+      "title": "Jiffy",
+      "list_items": [],
+      "api_urls": [
+        "https://maps.googleapis.com/maps/api/js?key=AIzaSyA4d6l4ewK5X-BN6vSI28SK8IX1KFY233E&amp;libraries=places,drawing&amp;language=en"
+      ],
+      "sample_rows": [],
+      "captured_fetches": []
+    }
+  ]
+}

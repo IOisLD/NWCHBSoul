@@ -11,6 +11,8 @@ import argparse
 import json
 from scripts.crawler import crawl
 from scripts.scraper import scrape_page
+from scripts.utils import get_fetch_logger_script
+from scripts.interactive_explorer import InteractiveExplorer
 from playwright.sync_api import sync_playwright
 
 
@@ -24,7 +26,21 @@ def run(start_url, max_depth=1, headless=True, output=None, limit=None):
         for u in urls:
             try:
                 page.goto(u, timeout=30000)
+                
+                # Explore the page deeply (General, Request/Response Headers, Network Log, Forms, Buttons, Tables, API Patterns)
+                explorer = InteractiveExplorer(page, headless=headless)
+                explorer.inject_network_logger()
+                
+                # Allow a moment for any on-load network activity
+                page.wait_for_timeout(2000)
+                
+                # Get basic scrape data
                 data = scrape_page(page)
+                
+                # Merge explorer report into data
+                report = explorer.generate_report()
+                data['exploration_report'] = report
+                
                 results.append(data)
             except Exception:
                 results.append({'url': u, 'error': 'failed to load or scrape'})

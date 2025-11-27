@@ -1,0 +1,41 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "success": true,
+    "residents": [
+      {
+        "id": 1,
+        "name": "John Smith",
+        "email": "john.smith@example.com",
+        "property_id": 101,
+        "unit": "101A",
+        "balance": 1200.50,
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "name": "Jane Doe",
+        "email": "jane.doe@example.com",
+        "property_id": 101,
+        "unit": "102B",
+        "balance": 850.00,
+        "status": "active"
+      },
+      {
+        "id": 3,
+        "name": "Bob Johnson",
+        "email": "bob.j@example.com",
+        "property_id": 102,
+        "unit": "201A",
+        "balance": 0,
+        "status": "paid"
+      }
+    ],
+    "total": 3,
+    "page": 1,
+    "per_page": 50
+  }
+}

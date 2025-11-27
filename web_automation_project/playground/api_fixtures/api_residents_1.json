@@ -1,0 +1,30 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "success": true,
+    "id": 1,
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "property_id": 101,
+    "unit": "101A",
+    "balance": 1200.50,
+    "status": "active",
+    "payment_history": [
+      {
+        "date": "2025-11-01",
+        "amount": 500,
+        "method": "credit_card",
+        "status": "completed"
+      },
+      {
+        "date": "2025-10-01",
+        "amount": 500,
+        "method": "ach_transfer",
+        "status": "completed"
+      }
+    ]
+  }
+}

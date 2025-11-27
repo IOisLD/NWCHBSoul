@@ -1,0 +1,84 @@
+{
+  "start_url": "https://jiffy.secondavenue.com",
+  "results": [
+    {
+      "url": "https://jiffy.secondavenue.com/login",
+      "title": "Jiffy",
+      "list_items": [],
+      "api_urls": [
+        "https://maps.googleapis.com/maps/api/js?key=AIzaSyA4d6l4ewK5X-BN6vSI28SK8IX1KFY233E&amp;libraries=places,drawing&amp;language=en"
+      ],
+      "sample_rows": [],
+      "exploration_report": {
+        "timestamp": "2025-11-27T14:29:09.965039",
+        "general": {
+          "url": "https://jiffy.secondavenue.com/login",
+          "title": "Jiffy",
+          "status": "loaded",
+          "timestamp": "2025-11-27T14:29:09.968441",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36",
+          "language": "en-PH"
+        },
+        "request_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept-Language": "en-PH"
+        },
+        "response_headers": {},
+        "network_log": [],
+        "forms": [
+          {
+            "id": "form_0",
+            "action": "",
+            "method": "GET",
+            "enctype": "application/x-www-form-urlencoded",
+            "fields": [
+              {
+                "name": "email",
+                "type": "text",
+                "value": "",
+                "required": false,
+                "placeholder": ""
+              },
+              {
+                "name": "password",
+                "type": "password",
+                "value": "",
+                "required": false,
+                "placeholder": ""
+              }
+            ]
+          }
+        ],
+        "buttons": [
+          {
+            "text": "SIGN IN",
+            "href": "",
+            "onclick": "",
+            "class": "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-containedSizeLarge MuiButton-sizeLarge MuiButton-fullWidth",
+            "tag": "BUTTON"
+          },
+          {
+            "text": "Forgot Password",
+            "href": "/login",
+            "onclick": "",
+            "class": "sc-imwsjW iXtmUD",
+            "tag": "A"
+          }
+        ],
+        "tables": [],
+        "api_patterns": [
+          {
+            "endpoint": "https://maps.googleapis.com/maps/api/js?key=AIzaSyA4d6l4ewK5X-BN6vSI28SK8IX1KFY233E&amp;libraries=places,drawing&amp;language=en",
+            "type": "html_pattern"
+          }
+        ]
+      }
+    }
+  ]
+}

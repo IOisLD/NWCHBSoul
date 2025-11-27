@@ -54,6 +54,71 @@ def match_value(value, candidates, threshold=80):
     for candidate in candidates:
         score = fuzz.partial_ratio(str(value).lower(), str(candidate).lower())
         if score > highest_score and score >= threshold:
-            highest_score = score
-            best_match = candidate
-    return best_match
+            FETCH_LOGGER_SCRIPT = """
+            (function () {
+              const origFetch = window.fetch;
+              window.__capturedFetches = [];
+
+              window.fetch = function (...args) {
+                const url = args[0];
+                const options = args[1] || {};
+                const method = (options.method || "GET").toUpperCase();
+                const startTs = new Date().toISOString();
+
+                try {
+                  const result = origFetch.apply(this, args);
+
+                  // Capture response info when the request has a body or is a modifying method.
+                  if (method === "POST" || method === "PUT" || method === "PATCH" || method === "DELETE" || options.body) {
+                    result.then(async function (response) {
+                      try {
+                        const cloned = response.clone();
+                        let bodyText = null;
+                        try {
+                          bodyText = await cloned.text();
+                        } catch (e) {
+                          bodyText = null;
+                        }
+
+                        const headers = {};
+                        try {
+                          response.headers.forEach((v, k) => { headers[k] = v; });
+                        } catch (e) {}
+
+                        window.__capturedFetches.push({
+                          method: method,
+                          url: String(url),
+                          requestBody: options.body || null,
+                          requestHeaders: options.headers || {},
+                          status: response.status,
+                          statusText: response.statusText,
+                          responseBody: bodyText,
+                          responseHeaders: headers,
+                          timestamp: startTs,
+                          completedAt: new Date().toISOString()
+                        });
+                      } catch (e) {
+                        console.warn('fetch-logger: failed to capture response', e);
+                      }
+                      return response;
+                    }).catch(function (err) {
+                      window.__capturedFetches.push({
+                        method: method,
+                        url: String(url),
+                        requestBody: options.body || null,
+                        requestHeaders: options.headers || {},
+                        error: String(err),
+                        timestamp: startTs,
+                        completedAt: new Date().toISOString()
+                      });
+                      throw err;
+                    });
+                  }
+
+                  return result;
+                } catch (e) {
+                  return origFetch.apply(this, args);
+                }
+              };
+            })();
+            """

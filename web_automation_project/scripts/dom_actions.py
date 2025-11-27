@@ -121,9 +121,20 @@ class DOMActions:
             return False
 
     def get_captured_fetches(self):
-        """Retrieve all captured POST fetches from window.__capturedFetches.
+        """Retrieve all captured fetches from `window.__capturedFetches`.
 
-        Returns a list of dictionaries with keys: method, url, body, headers, timestamp.
+        Returns a list of dictionaries. Each entry may include keys:
+        - `method`: HTTP method (e.g. "POST")
+        - `url`: request URL
+        - `requestBody`: body sent with the request (may be stringified JSON)
+        - `requestHeaders`: request headers
+        - `status`: numeric HTTP response status (when available)
+        - `statusText`: response status text
+        - `responseBody`: response body as text (when captured)
+        - `responseHeaders`: captured response headers
+        - `timestamp`: request start timestamp
+        - `completedAt`: request completion timestamp
+        - `error`: error string if the request failed
         """
         if not self.page:
             print("[DOM] page not available for get_captured_fetches")

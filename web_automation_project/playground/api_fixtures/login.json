@@ -1,0 +1,19 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "X-API-Version": "1.0"
+  },
+  "body": {
+    "success": true,
+    "message": "Login successful",
+    "user": {
+      "id": 1,
+      "email": "admin@jiffy.local",
+      "name": "Test Admin",
+      "role": "admin",
+      "organization": "Jiffy Test Org"
+    },
+    "token": "mock-jwt-token-12345"
+  }
+}

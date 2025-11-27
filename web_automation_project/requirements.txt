@@ -1,5 +1,16 @@
 pandas
-requests
-playwright
 openpyxl
-fuzzywuzzy 
+playwright
+requests
+click
+# optional fuzzy matching
+fuzzywuzzy
+python-Levenshtein
+# testing
+pytest
+pytest-cov
+pytest-mock
+python-dotenv
+# mock API server & testing playground
+flask
+flask-cors

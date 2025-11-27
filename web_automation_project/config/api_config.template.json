@@ -1,0 +1,19 @@
+{
+  "api": {
+    "endpoint": "https://jiffy.secondavenue.com/api/payments/update",
+    "auth_type": "bearer",
+    "auth_token": "YOUR_API_TOKEN_HERE",
+    "timeout": 30,
+    "retry_count": 3
+  },
+  "browser": {
+    "headless": false,
+    "timeout": 30000
+  },
+  "selectors": {
+    "resident_table_row": "tr",
+    "resident_name_cell": 0,
+    "resident_href_attr": "data-href",
+    "payment_button": "button:has-text('Add Credit')"
+  }
+}

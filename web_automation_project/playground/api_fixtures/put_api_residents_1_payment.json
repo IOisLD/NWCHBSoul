@@ -1,0 +1,15 @@
+{
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "success": true,
+    "message": "Payment processed successfully",
+    "resident_id": 1,
+    "amount": 500,
+    "new_balance": 700.50,
+    "transaction_id": "txn_mock_12345",
+    "timestamp": "2025-11-27T14:30:00Z"
+  }
+}
